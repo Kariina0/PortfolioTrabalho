@@ -16,4 +16,4 @@ Este repositório contém meu site de portfólio pessoal, desenvolvido em **HTML
 Acesse o portfólio em: [GitHub Pages](https://kariina0.github.io/PortfolioTrabalho)
 
 ---
-© 2026 - Karina Alves
+© 2026 - Karina Alves Pinheiro
