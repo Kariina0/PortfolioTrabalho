@@ -34,7 +34,11 @@ jobs:
       # 4. Bloquear arquivos maiores que 500KB
       - name: Verificar tamanho máximo dos arquivos (500KB)
         run: |
-          if find . -type f -size +500k | grep .; then
+          if find . -type f -size +500k \
+            ! -path "./.git/*" \
+            ! -path "./.github/*" \
+            ! -path "./node_modules/*" \
+            | grep .; then
             echo "ERRO: Arquivo(s) maior(es) que 500KB encontrado(s)"
             exit 1
           fi
@@ -55,5 +59,6 @@ jobs:
       # 6. Verificar links e imagens inválidos
       - name: Verificar links e imagens inválidos
         run: |
+          test -f index.html
           npm install -g broken-link-checker
-          blc index.html --recursive --filter-level=3
+          blc ./index.html --recursive --filter-level=3
