@@ -1,0 +1,34 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+      - name: Verificar index.html
+        run: test -f index.html
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instalar HTMLHint
+        run: npm install -g htmlhint
+
+      - name: Rodar HTMLHint
+        run: htmlhint .
+      - name: Verificar arquivos grandes
+        run: |
+          find . -type f -size +500k -print && exit 1 || echo "OK"
+      - name: Procurar termos proibidos
+        run: |
+          grep -r -E "TODO|FIXME|senha|password" . && exit 1 || echo "Clean"
+      - name: Instalar Linkinator
+        run: npm install -g linkinator
+
+      - name: Validar links
+        run: linkinator ./index.html
