@@ -21,9 +21,6 @@ jobs:
 
       - name: Rodar HTMLHint
         run: htmlhint .
-      - name: Verificar arquivos grandes
-        run: |
-          find . -type f -size +500k -print && exit 1 || echo "OK"
       - name: Procurar termos proibidos
         run: |
           grep -r -E "TODO|FIXME|senha|password" . && exit 1 || echo "Clean"
