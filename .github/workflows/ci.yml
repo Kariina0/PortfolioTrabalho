@@ -39,11 +39,16 @@ jobs:
             exit 1
           fi
 
-      # 5. Bloquear termos proibidos
+      # 5. Varredura de termos proibidos
       - name: Varredura de termos proibidos
         run: |
-          if grep -RniE "TODO|FIXME|senha|password" .; then
-            echo "ERRO: Termos proibidos encontrados no código"
+          if grep -RniE "TODO|FIXME|senha|password" \
+            --exclude-dir={.git,.github,node_modules} \
+            --include=\*.html \
+            --include=\*.css \
+            --include=\*.js \
+            .; then
+            echo "ERRO: Termos proibidos encontrados no código de produção"
             exit 1
           fi
 
