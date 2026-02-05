@@ -1,31 +1,54 @@
-name: CI Pipeline
+name: CI - Validação HTML
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
 jobs:
   validate:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout código
-        uses: actions/checkout@v3
-      - name: Verificar index.html
-        run: test -f index.html
-      - name: Configurar Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
 
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # 1. Falhar se o arquivo principal não for index.html
+      - name: Verificar nome do arquivo HTML principal
+        run: |
+          if ls *.html | grep -v "^index.html$"; then
+            echo "ERRO: O arquivo HTML deve se chamar exatamente index.html"
+            exit 1
+          fi
+
+      # 2. Instalar HTML Linter
       - name: Instalar HTMLHint
         run: npm install -g htmlhint
 
-      - name: Rodar HTMLHint
-        run: htmlhint .
-      - name: Procurar termos proibidos
+      # 3. Executar Linter no HTML
+      - name: Executar Linter HTML
         run: |
-          grep -r -E "TODO|FIXME|senha|password" . && exit 1 || echo "Clean"
-      - name: Instalar Linkinator
-        run: npm install -g linkinator
+          htmlhint index.html
 
-      - name: Validar links
-        run: linkinator ./index.html
+      # 4. Bloquear arquivos maiores que 500KB
+      - name: Verificar tamanho máximo dos arquivos (500KB)
+        run: |
+          if find . -type f -size +500k | grep .; then
+            echo "ERRO: Arquivo(s) maior(es) que 500KB encontrado(s)"
+            exit 1
+          fi
+
+      # 5. Bloquear termos proibidos
+      - name: Varredura de termos proibidos
+        run: |
+          if grep -RniE "TODO|FIXME|senha|password" .; then
+            echo "ERRO: Termos proibidos encontrados no código"
+            exit 1
+          fi
+
+      # 6. Verificar links e imagens inválidos
+      - name: Verificar links e imagens inválidos
+        run: |
+          npm install -g broken-link-checker
+          blc index.html --recursive --filter-level=3
