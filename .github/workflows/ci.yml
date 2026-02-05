@@ -56,9 +56,9 @@ jobs:
             exit 1
           fi
 
-      # 6. Verificar links e imagens inválidos
+      # 6. Verificar links e imagens inválidos (CORRETO)
       - name: Verificar links e imagens inválidos
         run: |
           test -f index.html
           npm install -g broken-link-checker
-          blc ./index.html --recursive --filter-level=3
+          blc ./index.html --local --recursive --filter-level=3
